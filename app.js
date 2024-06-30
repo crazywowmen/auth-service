@@ -9,17 +9,17 @@ const app = express();
 //Middlewares
 app.use(bodyParser.json());
 app.use(cors());
-app.use('/api', require('./routes/authRoutes'))
+app.use('/api', require('./routes/authRoutes'));
 
 app.get('/api', (req, res) => {
-    res.status(200).json({ message: 'Welcome in AUTH Service, Enjoy the /signup & /signin POST routes.' })
+    res.status(200).json({ message: 'Welcome in AUTH Service, Enjoy the /signup & /signin POST routes.' });
 });
 app.get('/', (req, res) => {
-    res.status(200).json({ message: 'Welcome in AUTH Service, Enjoy the /api/signup & /api/signin POST routes.' })
+    res.status(200).json({ message: 'Welcome in AUTH Service, Enjoy the /api/signup & /api/signin POST routes.' });
 });
 
 //Connection with DB
-const MONGODB_URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.qzgcd.mongodb.net/${process.env.DB_DATABASE}?retryWrites=true&w=majority`;
+const MONGODB_URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_APP_NAME}.${process.env.DB_CLUSTER_URI}.mongodb.net/?retryWrites=true&w=majority&appName=${process.env.DB_APP_NAME}`;
 mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,

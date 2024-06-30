@@ -36,7 +36,6 @@ const signupUser = async (req, res) => {
     }
 }
 
-
 /**
  * User SignIn Controller
  * @param {Object} req
@@ -50,28 +49,29 @@ const signinUser = async (req, res) => {
             return res.status(422).json({ error: "email and password required" });
         }
 
-        //Check Email already exists
         const user = await UsersModel.findOne({ email });
         if (!user) {
             return res.status(404).json({ error: "invalid user" });
         }
 
-        //Password checking
-        const isCorrectPassword = await bcrypt.compare(password, user.password)
+        const isCorrectPassword = await bcrypt.compare(password, user.password);
         if (!isCorrectPassword) {
             return res.status(401).json({ error: "invalid Email and Password" });
         }
 
-        //token generate with JWT
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_AUTH_SERVICE)
+        // Update login state
+        user.lastLogin = new Date();
+        user.isLoggedIn = true;
+        await user.save();
 
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_AUTH_SERVICE);
 
         return res.status(200).json({
             token,
             message: "Login success",
         });
     } catch (error) {
-        res.status(400).json({ error: 'internal server error: ' + error })
+        res.status(400).json({ error: 'internal server error: ' + error });
     }
 }
 
@@ -91,5 +91,27 @@ const testUnProtected = async (req, res) => {
     }
 }
 
+const isUserSignedIn = async (req, res) => {
+    try {
+        const { email } = req.query;
+        if (!email) {
+            return res.status(400).json({ error: "Email is required" });
+        }
 
-module.exports = { signupUser, signinUser, testUnProtected, testProtected };
+        const user = await UsersModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Check login status
+        if (user.isLoggedIn) {
+            return res.status(200).json({ message: 'User is signed in', lastLogin: user.lastLogin });
+        } else {
+            return res.status(401).json({ message: 'User is not signed in' });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal server error: ' + error });
+    }
+}
+
+module.exports = { signupUser, signinUser, testUnProtected, testProtected, isUserSignedIn };

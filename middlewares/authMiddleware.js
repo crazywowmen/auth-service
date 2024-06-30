@@ -7,7 +7,7 @@ const authMiddleware = (req, res, next) => {
             return res.status(401).json({ error: 'unauthorize user' });
         }
 
-        //Verify Token
+        // Verify Token
         const { userId } = jwt.verify(authorization, process.env.JWT_SECRET_AUTH_SERVICE);
         req.user = userId;
 

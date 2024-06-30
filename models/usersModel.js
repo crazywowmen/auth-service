@@ -3,15 +3,15 @@ const mongoose = require('mongoose');
 const usersSchema = mongoose.Schema({
     name: {
         type: String,
-        require: true
+        required: true
     },
     email: {
         type: String,
-        require: true
+        required: true
     },
     password: {
         type: String,
-        require: true
+        required: true
     },
     description: {
         type: String
@@ -20,6 +20,13 @@ const usersSchema = mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    lastLogin: {  // Add this field
+        type: Date
+    },
+    isLoggedIn: {  // Add this field
+        type: Boolean,
+        default: false
+    }
 });
 
 module.exports = mongoose.model('User', usersSchema);
